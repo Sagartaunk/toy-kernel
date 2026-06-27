@@ -2,12 +2,14 @@
 //! and/or structs and enum's.
 
 use core::fmt;
+use lazy_static::lazy_static;
+use spin::Mutex;
 use volatile::Volatile;
 /// Define all the colors here with there color code.
 #[allow(dead_code)]
-#[derive(Debug, Clone, Copy, PatrialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
-pub enum color {
+pub enum Color {
     Black = 0,
     Blue = 1,
     Green = 2,
@@ -40,7 +42,7 @@ impl ColorCode {
     /// stores numbers upto `15` hence it only requires 4 bits
     /// of storage allowing us to efficiently use a single `u8`
     /// type to store both the foreground and background.
-    fn new(foreground: color, background: color) -> ColorCode {
+    fn new(foreground: Color, background: Color) -> ColorCode {
         ColorCode((background as u8) << 4 | (foreground as u8))
     }
 }
@@ -81,12 +83,12 @@ impl Writer {
         // Check if we recieved a "/n" to change line otherwise
         // display the byte.
         match byte {
-            b"/n" => self.new_line(),
+            b'\n' => self.new_line(),
             byte => {
-                if self.column_position >= BUFFER_WIFTH {
+                if self.column_position >= BUFFER_WIDTH {
                     self.new_line();
                 }
-                let row = BUFFER_HIEGHT - 1;
+                let row = BUFFER_HEIGHT - 1;
                 let col = self.column_position;
 
                 let color_code = self.color_code;
@@ -140,8 +142,10 @@ impl fmt::Write for Writer {
 }
 
 /// Declare a Global instance for display.
-pub static WRITER: Writer = Writer {
-    column_position: 0,
-    color_code: ColorCode::new(Color::Yellow, Color::Black),
-    buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
-};
+lazy_static! {
+    pub static ref WRITER: Mutex<Writer> = Mutex::new(Writer {
+        column_position: 0,
+        color_code: ColorCode::new(Color::Yellow, Color::Black),
+        buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
+    });
+}

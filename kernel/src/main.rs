@@ -1,8 +1,13 @@
-// Disable both the `std` library and the `main`
-// entry point.
+//! This is the entry point of the kernel
+//! and glues togeather all the functionality.
 
+//! Disable both the `std` library and the `main`
+//! entry point.
 #![no_std]
 #![no_main]
+
+// Import display module.
+mod vga_buffer;
 
 /// Convert test to bytes before displaying.
 static DISPLAY: &[u8] = b"SAGAR TAUNK";
@@ -27,13 +32,18 @@ pub extern "C" fn _start() -> ! {
     // The address `0xb8000` is assigned to the display
     // buffer and the `vga` card listens to changes in
     // this address range.
-    let vga_buffer = 0xb8000 as *mut u8;
+    use core::fmt::Write;
+    vga_buffer::WRITER
+        .lock()
+        .write_str("This will be printed through the new function")
+        .unwrap();
+    write!(
+        vga_buffer::WRITER.lock(),
+        ", some numbers: {} {}",
+        42,
+        1.337
+    )
+    .unwrap();
 
-    for (i, &bytes) in DISPLAY.iter().enumerate() {
-        unsafe {
-            *vga_buffer.offset(i as isize * 2) = bytes;
-            *vga_buffer.offset(i as isize * 2 + 1) = 0xb;
-        }
-    }
     loop {}
 }
