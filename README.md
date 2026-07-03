@@ -9,10 +9,8 @@ implementing a basic toy-kernel for it. This is not supposed
 to become a production grade kernel at any point in time.
 
 ## NOTE: 
-Any damages that may occur from running or testing this project 
-are not my responsibility. This is my first time making a kernel
-and I don't know how it works and will be learning as I go.
-Please, use or test at your own risk.
+I have followed `Phillip Oppermann's` blog for building this 
+kernel. You can check it out here: `https://os.phil-opp.com`.
 
 
 ## Learning Notes:
