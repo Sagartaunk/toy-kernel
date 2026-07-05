@@ -30,9 +30,20 @@ mod serial;
 ///
 /// The function depends on the `println` macro defined
 /// in `vga_buffer.rs`.
+#[cfg(not(test))]
 #[panic_handler]
 pub fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
+    loop {}
+}
+
+/// This panic handeller only woks in test mode.
+#[cfg(test)]
+#[panic_handler]
+fn panic(info: &PanicInfo) -> ! {
+    serial_println!("[failed]\n");
+    serial_println!("Error: {}\n", info);
+    tests::exit_qemu(tests::QemuExitCode::Failed);
     loop {}
 }
 
