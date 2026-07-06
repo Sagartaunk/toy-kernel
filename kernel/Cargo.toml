@@ -27,3 +27,6 @@ test-args = [
     "-display", "none",
 ]
 test-success-exit-code = 33
+# To prevent endless looping in case of a failure set
+# test-timeout to  5 mins.
+test-timeout = 300
