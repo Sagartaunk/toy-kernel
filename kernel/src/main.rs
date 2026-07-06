@@ -22,6 +22,9 @@
 mod tests;
 mod vga_buffer;
 use core::panic::PanicInfo;
+
+#[cfg(test)]
+use crate::tests::Testable;
 mod serial;
 
 /// When something panic's this function is called.
@@ -50,7 +53,7 @@ fn panic(info: &PanicInfo) -> ! {
 /// Entry point of the binary.
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() {
-    println!("Hello World{}", "!");
+    serial_println!("Hello World{}", "!");
 
     #[cfg(test)]
     test_main();
@@ -59,10 +62,10 @@ pub extern "C" fn _start() {
 }
 
 #[cfg(test)]
-pub fn test_runner(tests: &[&dyn Fn()]) {
+pub fn test_runner(tests: &[&dyn Testable]) {
     serial_println!("Running {} tests", tests.len());
     for test in tests {
-        test();
+        test.run();
     }
 
     tests::exit_qemu(tests::QemuExitCode::Success);

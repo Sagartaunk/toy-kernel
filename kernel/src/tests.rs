@@ -3,6 +3,8 @@
 
 use crate::print;
 use crate::println;
+use crate::serial_print;
+use crate::serial_println;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
@@ -21,8 +23,22 @@ pub fn exit_qemu(exit_code: QemuExitCode) {
 }
 
 #[test_case]
-pub fn trivial_assertion() {
-    print!("trivial assertion... ");
+fn trivial_assertion() {
     assert_eq!(1, 1);
-    println!("[ok]");
+}
+
+pub trait Testable {
+    fn run(&self) -> ();
+}
+
+/// Automatically print status information for test cases
+impl<T> Testable for T
+where
+    T: Fn(),
+{
+    fn run(&self) {
+        serial_print!("{}", core::any::type_name::<T>());
+        self();
+        serial_println!("[OK]");
+    }
 }
