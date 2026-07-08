@@ -52,13 +52,20 @@ fn panic(info: &PanicInfo) -> ! {
 
 /// Entry point of the binary.
 #[unsafe(no_mangle)]
-pub extern "C" fn _start() {
+pub extern "C" fn _start() -> ! {
     serial_println!("Hello World{}", "!");
+
+    kernel::init();
+    // invoke a breakpoint exception
+    x86_64::instructions::interrupts::int3();
 
     #[cfg(test)]
     test_main();
 
     tests::exit_qemu(tests::QemuExitCode::Success);
+
+    println!("Works till here most likely");
+    loop {}
 }
 
 #[cfg(test)]
