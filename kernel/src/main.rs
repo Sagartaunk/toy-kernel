@@ -64,6 +64,10 @@ pub extern "C" fn _start() -> ! {
 
     tests::exit_qemu(tests::QemuExitCode::Success);
 
+    unsafe {
+        *(0xdeadadd as *mut u8) = 31;
+    }
+
     println!("Works till here most likely");
     loop {}
 }
