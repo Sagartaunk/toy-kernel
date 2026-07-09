@@ -6,6 +6,7 @@
 // Enable `x86-interrupt` calling convention
 #![feature(abi_x86_interrupt)]
 
+pub mod gdt;
 pub mod interrupts;
 pub mod serial;
 pub mod tests;
@@ -28,5 +29,6 @@ fn panic(info: &PanicInfo) -> ! {
 }
 
 pub fn init() {
+    gdt::init();
     interrupts::init_idt();
 }
