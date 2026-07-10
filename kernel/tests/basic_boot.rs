@@ -3,9 +3,10 @@
 #![no_main]
 #![feature(custom_test_frameworks)]
 #![reexport_test_harness_main = "test_main"]
-#![test_runner(kernel::test_runner)]
+#![test_runner(kernel::tests::test_runner)]
 
 use core::panic::PanicInfo;
+use kernel::tests::test_panic_handler;
 
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> ! {
@@ -20,10 +21,5 @@ fn test_runner(tests: &[&dyn Fn()]) {
 
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-    loop {}
-}
-
-#[panic_handler]
-fn panic(info: &PanicInfo) -> ! {
-    blog_os::test_panic_handler(info)
+    test_panic_handler(info)
 }
