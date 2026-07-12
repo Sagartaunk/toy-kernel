@@ -3,9 +3,10 @@
 #![feature(abi_x86_interrupt)]
 
 use crate::{gdt, println};
-use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
-
 use lazy_static::lazy_static;
+use pic8259::ChainedPics;
+use spin;
+use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
 
 /// Define an Interrupt descriptor table.
 lazy_static! {
@@ -38,3 +39,10 @@ extern "x86-interrupt" fn double_fault_handler(
 ) -> ! {
     panic!("Exception: DOUBLE FAULT\n{:#?}", stack_frame);
 }
+
+pub const PIC1_OFFSET: u8 = 32;
+pub const PIC2_OFFSET: u8 = 1;
+// SAFETY: Thr pic's are placed at valid addresses starting from 32.
+// Thus, leaving all the bits used for exception are seperate.
+pub static PICS: spin::Mutex<ChainedPics> =
+    spin::Mutex::new(unsafe { ChainedPics::new(PIC1_OFFSET, PIC2_OFFSET) });
