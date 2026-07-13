@@ -22,6 +22,7 @@
 mod tests;
 mod vga_buffer;
 use core::panic::PanicInfo;
+use kernel::hlt_loop;
 
 #[cfg(test)]
 use crate::tests::Testable;
@@ -47,7 +48,7 @@ fn panic(info: &PanicInfo) -> ! {
     serial_println!("[failed]\n");
     serial_println!("Error: {}\n", info);
     tests::exit_qemu(tests::QemuExitCode::Failed);
-    loop {}
+    hlt_loop();
 }
 
 /// Entry point of the binary.
@@ -61,7 +62,7 @@ pub extern "C" fn _start() -> ! {
     test_main();
 
     println!("Works till here most likely");
-    loop {}
+    kernel::hlt_loop();
 }
 
 #[cfg(test)]

@@ -1,6 +1,7 @@
 //! This module contains dependencies of the test
 //! harness of the kernel as well as the test cases
 
+use crate::hlt_loop;
 use crate::print;
 use crate::println;
 use crate::serial_print;
@@ -35,7 +36,9 @@ pub fn test_panic_handler(info: &PanicInfo) -> ! {
     serial_println!("[failed]\n");
     serial_println!("Error: {}\n", info);
     exit_qemu(QemuExitCode::Failed);
-    loop {}
+    loop {
+        hlt_loop();
+    }
 }
 
 #[test_case]
