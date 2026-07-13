@@ -56,17 +56,9 @@ pub extern "C" fn _start() -> ! {
     serial_println!("Hello World{}", "!");
 
     kernel::init();
-    // invoke a breakpoint exception
-    x86_64::instructions::interrupts::int3();
 
     #[cfg(test)]
     test_main();
-
-    tests::exit_qemu(tests::QemuExitCode::Success);
-
-    unsafe {
-        *(0xdeadadd as *mut u8) = 31;
-    }
 
     println!("Works till here most likely");
     loop {}
