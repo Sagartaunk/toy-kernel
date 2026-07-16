@@ -21,6 +21,7 @@
 // Import display module.
 mod tests;
 mod vga_buffer;
+use bootloader::BootInfo;
 use core::panic::PanicInfo;
 use kernel::hlt_loop;
 
@@ -53,7 +54,7 @@ fn panic(info: &PanicInfo) -> ! {
 
 /// Entry point of the binary.
 #[unsafe(no_mangle)]
-pub extern "C" fn _start() -> ! {
+pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
     serial_println!("Hello World{}", "!");
 
     kernel::init();
