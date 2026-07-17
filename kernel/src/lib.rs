@@ -8,16 +8,22 @@
 
 pub mod gdt;
 pub mod interrupts;
+pub mod memory;
 pub mod serial;
 pub mod tests;
 pub mod vga_buffer;
 use crate::tests::test_panic_handler;
 use core::panic::PanicInfo;
 
+#[cfg(test)]
+use bootloader::{BootInfo, entry_point};
+
+#[cfg(test)]
+entry_point!(test_kernel_main);
+
 // Entry point for `cargo tests`.
 #[cfg(test)]
-#[unsafe(no_mangle)]
-pub extern "C" fn _start() -> ! {
+pub fn kernel_test_main(_boot_info: &'static BootInfo) -> ! {
     inti();
     test_main();
     hlt_loop();
