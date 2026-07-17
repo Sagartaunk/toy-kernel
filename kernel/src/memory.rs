@@ -1,7 +1,8 @@
 //! This module contains the memory management
 //! implementations.
 
-use x86_64::{VirtAddr, structures::paging::PageTable};
+use x86_64::registers::control::Cr3;
+use x86_64::{PhysAddr, VirtAddr, structures::paging::PageTable};
 
 /// Return a mutable reference to the active `level 4` table.
 ///
@@ -11,8 +12,7 @@ use x86_64::{VirtAddr, structures::paging::PageTable};
 ///
 /// SAFETY: This function must only be called once to avoid
 /// `&mut` which will trigger an undefined behaviour.
-
-pub unsafe fn active_level_4_table(physical_memory_offset: VirtAddr) -> &'static mut PageTable {
+unsafe fn active_level_4_table(physical_memory_offset: VirtAddr) -> &'static mut PageTable {
     use x86_64::registers::control::Cr3;
 
     let (level_4_table_frame, _) = Cr3::read();
@@ -22,4 +22,14 @@ pub unsafe fn active_level_4_table(physical_memory_offset: VirtAddr) -> &'static
     let page_table_ptr: *mut PageTable = virt.as_mut_ptr();
 
     unsafe { &mut *page_table_ptr }
+}
+
+/// Initialize a new OffsetPageTable.
+///
+/// SAFETY: Same as `active_level_4_table` above.
+pub unsafe fn init(physical_memory_offset: VirtAddr) -> OffsetPageTable<'static> {
+    unsafe {
+        let level_4_table = active_level_4_table(physical_memory_offset);
+        OffsetPageTable::new(level_4_table, physical_memory_offset)
+    }
 }
